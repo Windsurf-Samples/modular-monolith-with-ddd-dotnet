@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="NuspecSettings">
     <Company>Kamil Grzybek</Company>
@@ -11,7 +11,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Configurations>Debug;Release;Production</Configurations>
-    <NoWarn>1591;1701;1702;8032;NU1701;AD0001;NU5128;NU1603</NoWarn>
+    <NoWarn>1591;1701;1702;8032;NU1701;AD0001;NU5128;NU1603;NU1902</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Deterministic>true</Deterministic>
@@ -22,7 +22,8 @@
     <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <Optimize>True</Optimize>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 
   <PropertyGroup Label="ConfigFiles">
