@@ -1,20 +1,16 @@
-output "ses_domain_identity_arn" {
-  description = "ARN of the SES domain identity"
-  value       = module.ses.domain_identity_arn
-}
-
-output "ses_domain_identity_verification_token" {
-  description = "Verification token for SES domain identity"
-  value       = module.ses.domain_identity_verification_token
-}
-
-output "ses_dkim_tokens" {
-  description = "DKIM tokens for domain verification"
-  value       = module.ses.dkim_tokens
+output "sns_topic_arns" {
+  description = "ARNs of all SNS topics"
+  value = {
+    user_registration_confirmation = module.sns.user_registration_topic_arn
+    meeting_group_created         = module.sns.meeting_group_created_topic_arn
+    meeting_attendee_added        = module.sns.meeting_attendee_added_topic_arn
+    subscription_created          = module.sns.subscription_created_topic_arn
+    subscription_renewed          = module.sns.subscription_renewed_topic_arn
+  }
 }
 
 output "lambda_email_role_arn" {
-  description = "ARN of the Lambda execution role for email functions"
+  description = "ARN of the Lambda execution role for SNS publishing functions"
   value       = module.lambda_iam.email_lambda_role_arn
 }
 
