@@ -18,14 +18,3 @@ variable "project_name" {
   type        = string
   default     = "mymeetings"
 }
-
-variable "domain_name" {
-  description = "Domain name for SES verification (e.g., example.com)"
-  type        = string
-}
-
-variable "from_email" {
-  description = "Default from email address for SES"
-  type        = string
-  default     = ""
-}

@@ -22,26 +22,28 @@ provider "aws" {
   }
 }
 
-module "ses" {
-  source = "../../modules/ses"
+module "sns" {
+  source = "../../modules/sns"
   
-  domain_name  = var.domain_name
   project_name = var.project_name
   environment  = "staging"
-  from_email   = var.from_email
 }
 
 module "lambda_iam" {
   source = "../../modules/lambda"
   
-  project_name           = var.project_name
-  environment           = "staging"
-  ses_domain_identity_arn = module.ses.domain_identity_arn
+  project_name = var.project_name
+  environment  = "staging"
 }
 
 module "eventbridge" {
   source = "../../modules/eventbridge"
   
-  project_name = var.project_name
-  environment  = "staging"
+  project_name                      = var.project_name
+  environment                       = "staging"
+  user_registration_topic_arn       = module.sns.user_registration_topic_arn
+  meeting_group_created_topic_arn   = module.sns.meeting_group_created_topic_arn
+  meeting_attendee_added_topic_arn  = module.sns.meeting_attendee_added_topic_arn
+  subscription_created_topic_arn    = module.sns.subscription_created_topic_arn
+  subscription_renewed_topic_arn    = module.sns.subscription_renewed_topic_arn
 }

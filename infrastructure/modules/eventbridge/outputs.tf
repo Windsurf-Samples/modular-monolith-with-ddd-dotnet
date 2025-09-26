@@ -27,3 +27,14 @@ output "email_dlq_arn" {
   description = "ARN of the SQS dead letter queue for email processing"
   value       = aws_sqs_queue.email_dlq.arn
 }
+
+output "sns_targets" {
+  description = "List of SNS target ARNs configured for EventBridge"
+  value = [
+    var.user_registration_topic_arn,
+    var.meeting_group_created_topic_arn,
+    var.meeting_attendee_added_topic_arn,
+    var.subscription_created_topic_arn,
+    var.subscription_renewed_topic_arn
+  ]
+}

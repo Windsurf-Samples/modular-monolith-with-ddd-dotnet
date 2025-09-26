@@ -19,9 +19,9 @@ resource "aws_iam_role" "email_lambda_role" {
   }
 }
 
-resource "aws_iam_policy" "ses_send_policy" {
-  name        = "${var.project_name}-${var.environment}-ses-send-policy"
-  description = "Policy for Lambda functions to send emails via SES"
+resource "aws_iam_policy" "sns_publish_policy" {
+  name        = "${var.project_name}-${var.environment}-sns-publish-policy"
+  description = "Policy for Lambda functions to publish messages to SNS topics"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -29,19 +29,11 @@ resource "aws_iam_policy" "ses_send_policy" {
       {
         Effect = "Allow"
         Action = [
-          "ses:SendEmail",
-          "ses:SendRawEmail",
-          "ses:SendTemplatedEmail"
+          "sns:Publish",
+          "sns:GetTopicAttributes",
+          "sns:ListSubscriptionsByTopic"
         ]
-        Resource = var.ses_domain_identity_arn
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ses:GetSendQuota",
-          "ses:GetSendStatistics"
-        ]
-        Resource = "*"
+        Resource = "arn:aws:sns:*:*:${var.project_name}-${var.environment}-*"
       }
     ]
   })
@@ -72,9 +64,9 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "ses_send_attachment" {
+resource "aws_iam_role_policy_attachment" "sns_publish_attachment" {
   role       = aws_iam_role.email_lambda_role.name
-  policy_arn = aws_iam_policy.ses_send_policy.arn
+  policy_arn = aws_iam_policy.sns_publish_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logging_attachment" {

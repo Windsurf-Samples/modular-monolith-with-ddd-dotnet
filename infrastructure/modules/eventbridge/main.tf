@@ -64,6 +64,76 @@ resource "aws_cloudwatch_event_target" "email_queue_target" {
   }
 }
 
+resource "aws_cloudwatch_event_target" "user_registration_sns_target" {
+  rule           = aws_cloudwatch_event_rule.email_events.name
+  event_bus_name = aws_cloudwatch_event_bus.main.name
+  target_id      = "UserRegistrationSNSTarget"
+  arn            = var.user_registration_topic_arn
+
+  input_transformer {
+    input_paths = {
+      detail = "$.detail"
+    }
+    input_template = "{\"detail\": <detail>}"
+  }
+}
+
+resource "aws_cloudwatch_event_target" "meeting_group_created_sns_target" {
+  rule           = aws_cloudwatch_event_rule.email_events.name
+  event_bus_name = aws_cloudwatch_event_bus.main.name
+  target_id      = "MeetingGroupCreatedSNSTarget"
+  arn            = var.meeting_group_created_topic_arn
+
+  input_transformer {
+    input_paths = {
+      detail = "$.detail"
+    }
+    input_template = "{\"detail\": <detail>}"
+  }
+}
+
+resource "aws_cloudwatch_event_target" "meeting_attendee_added_sns_target" {
+  rule           = aws_cloudwatch_event_rule.email_events.name
+  event_bus_name = aws_cloudwatch_event_bus.main.name
+  target_id      = "MeetingAttendeeAddedSNSTarget"
+  arn            = var.meeting_attendee_added_topic_arn
+
+  input_transformer {
+    input_paths = {
+      detail = "$.detail"
+    }
+    input_template = "{\"detail\": <detail>}"
+  }
+}
+
+resource "aws_cloudwatch_event_target" "subscription_created_sns_target" {
+  rule           = aws_cloudwatch_event_rule.email_events.name
+  event_bus_name = aws_cloudwatch_event_bus.main.name
+  target_id      = "SubscriptionCreatedSNSTarget"
+  arn            = var.subscription_created_topic_arn
+
+  input_transformer {
+    input_paths = {
+      detail = "$.detail"
+    }
+    input_template = "{\"detail\": <detail>}"
+  }
+}
+
+resource "aws_cloudwatch_event_target" "subscription_renewed_sns_target" {
+  rule           = aws_cloudwatch_event_rule.email_events.name
+  event_bus_name = aws_cloudwatch_event_bus.main.name
+  target_id      = "SubscriptionRenewedSNSTarget"
+  arn            = var.subscription_renewed_topic_arn
+
+  input_transformer {
+    input_paths = {
+      detail = "$.detail"
+    }
+    input_template = "{\"detail\": <detail>}"
+  }
+}
+
 resource "aws_sqs_queue_policy" "email_queue_policy" {
   queue_url = aws_sqs_queue.email_queue.id
 
