@@ -1,19 +1,20 @@
 using System.Reflection;
+using CompanyName.MyMeetings.ArchTests.SeedWork;
 using CompanyName.MyMeetings.Modules.Meetings.Application.Configuration.Commands;
 using CompanyName.MyMeetings.Modules.Meetings.Application.Configuration.Queries;
 using CompanyName.MyMeetings.Modules.Meetings.Application.Contracts;
-using CompanyName.MyMeetings.Modules.Meetings.ArchTests.SeedWork;
 using FluentValidation;
 using MediatR;
 using NetArchTest.Rules;
-using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace CompanyName.MyMeetings.Modules.Meetings.ArchTests.Application
 {
     [TestFixture]
-    public class ApplicationTests : TestBase
+    public class ApplicationTests : ApplicationArchTestsBase
     {
+        private static Assembly ApplicationAssembly => typeof(CommandBase).Assembly;
+
         [Test]
         public void Command_Should_Be_Immutable()
         {
@@ -89,112 +90,42 @@ namespace CompanyName.MyMeetings.Modules.Meetings.ArchTests.Application
         }
 
         [Test]
-        public void Validator_Should_Have_Name_EndingWith_Validator()
+        public void InternalCommand_Should_Have_JsonConstructorAttribute()
         {
-            var result = Types.InAssembly(ApplicationAssembly)
-                .That()
-                .Inherit(typeof(AbstractValidator<>))
-                .Should()
-                .HaveNameEndingWith("Validator")
-                .GetResult();
-
-            AssertArchTestResult(result);
-        }
-
-        [Test]
-        public void Validators_Should_Not_Be_Public()
-        {
-            var types = Types.InAssembly(ApplicationAssembly)
-                .That()
-                .Inherit(typeof(AbstractValidator<>))
-                .Should().NotBePublic().GetResult().FailingTypes;
-
-            AssertFailingTypes(types);
-        }
-
-        [Test]
-        public void InternalCommand_Should_Have_Constructor_With_JsonConstructorAttribute()
-        {
-            var types = Types.InAssembly(ApplicationAssembly)
-                .That()
-                .Inherit(typeof(InternalCommandBase))
-                .Or()
-                .Inherit(typeof(InternalCommandBase<>))
-                .GetTypes();
-
-            List<Type> failingTypes = [];
-
-            foreach (var type in types)
-            {
-                bool hasJsonConstructorDefined = false;
-                var constructors = type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-                foreach (var constructorInfo in constructors)
-                {
-                    var jsonConstructorAttribute = constructorInfo.GetCustomAttributes(typeof(JsonConstructorAttribute), false);
-                    if (jsonConstructorAttribute.Length > 0)
-                    {
-                        hasJsonConstructorDefined = true;
-                        break;
-                    }
-                }
-
-                if (!hasJsonConstructorDefined)
-                {
-                    failingTypes.Add(type);
-                }
-            }
-
-            AssertFailingTypes(failingTypes);
+            InternalCommand_Should_Have_JsonConstructorAttribute(
+                ApplicationAssembly,
+                typeof(InternalCommandBase),
+                typeof(InternalCommandBase<>));
         }
 
         [Test]
         public void MediatR_RequestHandler_Should_NotBe_Used_Directly()
         {
-            var types = Types.InAssembly(ApplicationAssembly)
-                .That().DoNotHaveName("ICommandHandler`1")
-                .Should().ImplementInterface(typeof(IRequestHandler<>))
-                .GetTypes();
-
-            List<Type> failingTypes = [];
-            foreach (var type in types)
-            {
-                bool isCommandHandler = type.GetInterfaces().Any(x =>
-                    x.IsGenericType &&
-                    x.GetGenericTypeDefinition() == typeof(ICommandHandler<>));
-                bool isCommandWithResultHandler = type.GetInterfaces().Any(x =>
-                    x.IsGenericType &&
-                    x.GetGenericTypeDefinition() == typeof(ICommandHandler<,>));
-                bool isQueryHandler = type.GetInterfaces().Any(x =>
-                    x.IsGenericType &&
-                    x.GetGenericTypeDefinition() == typeof(IQueryHandler<,>));
-                if (!isCommandHandler && !isCommandWithResultHandler && !isQueryHandler)
-                {
-                    failingTypes.Add(type);
-                }
-            }
-
-            AssertFailingTypes(failingTypes);
+            MediatR_RequestHandler_Should_NotBe_Used_Directly(
+                ApplicationAssembly,
+                typeof(ICommandHandler<>),
+                typeof(ICommandHandler<,>),
+                typeof(IQueryHandler<,>));
         }
 
         [Test]
         public void Command_With_Result_Should_Not_Return_Unit()
         {
-            Type commandWithResultHandlerType = typeof(ICommandHandler<,>);
-            IEnumerable<Type> types = Types.InAssembly(ApplicationAssembly)
-                .That().ImplementInterface(commandWithResultHandlerType)
-                .GetTypes().ToList();
+            Command_With_Result_Should_Not_Return_Unit(
+                ApplicationAssembly,
+                typeof(ICommandHandler<,>));
+        }
 
-            List<Type> failingTypes = [];
-            foreach (Type type in types)
-            {
-                Type interfaceType = type.GetInterface(commandWithResultHandlerType.Name);
-                if (interfaceType?.GenericTypeArguments[1] == typeof(Unit))
-                {
-                    failingTypes.Add(type);
-                }
-            }
+        [Test]
+        public void Validator_Should_Have_Name_EndingWith_Validator()
+        {
+            Validator_Should_Have_Name_EndingWith_Validator(ApplicationAssembly);
+        }
 
-            AssertFailingTypes(failingTypes);
+        [Test]
+        public void Validators_Should_Not_Be_Public()
+        {
+            Validators_Should_Not_Be_Public(ApplicationAssembly);
         }
     }
 }
